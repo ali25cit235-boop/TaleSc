@@ -13,13 +13,13 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y xfce4 xfce4-goodies xrdp
-        sudo systemctl enable xrdp
+        sudo adduser runner xrdp
         echo "xfce4-session" > ~/.xsession
         sudo service xrdp restart
 
-    - name: Set RDP User Password
+    - name: Set RDP Password
       run: |
-        echo "runneradmin:Pass123456!@#" | sudo chpasswd
+        echo "runner:Pass123456!@#" | sudo chpasswd
 
     - name: Setup Tailscale
       uses: tailscale/github-action@v2
@@ -33,7 +33,7 @@ jobs:
         echo "🚀 LINUX RDP READY FOR MSTSC"
         echo "=========================================="
         echo "CONNECT IP   : $ip"
-        echo "USERNAME     : runneradmin"
+        echo "USERNAME     : runner"
         echo "PASSWORD     : Pass123456!@#"
         echo "=========================================="
 
