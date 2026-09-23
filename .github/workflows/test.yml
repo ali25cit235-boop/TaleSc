@@ -24,10 +24,16 @@ jobs:
         Invoke-WebRequest -Uri "https://pkgs.tailscale.com/stable/tailscale-setup-latest.exe" -OutFile "tailscale.exe"
         Start-Process -FilePath ".\tailscale.exe" -ArgumentList "/quiet" -Wait
         
-        $tailscalePath = "C:\Program Files\Tailscale\tailscale.exe"
-        & $tailscalePath up --authkey=${{ secrets.TAILSCALE_AUTHKEY }}
-        
         Start-Sleep -Seconds 5
+        $tailscalePath = "C:\Program Files\Tailscale\tailscale.exe"
+        
+        # Start Tailscale Service explicitly
+        Start-Service Tailscale -ErrorAction SilentlyContinue
+        
+        # Connect to Tailscale network
+        & $tailscalePath up --authkey=${{ secrets.TAILSCALE_AUTHKEY }} --accept-routes --unattended
+        
+        Start-Sleep -Seconds 10
         $ip = (& $tailscalePath ip -4)
         
         Write-Host "=========================================="
