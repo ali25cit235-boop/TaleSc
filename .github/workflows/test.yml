@@ -1,4 +1,4 @@
-name: Linux RDP (Full Speed XRDP + Tailscale)
+name: Linux RDP (Playit.gg Fast Tunnel)
 
 on:
   workflow_dispatch:
@@ -21,22 +21,14 @@ jobs:
       run: |
         echo "runner:Pass123456!@#" | sudo chpasswd
 
-    - name: Setup Tailscale
-      uses: tailscale/github-action@v2
-      with:
-        authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
-
-    - name: Get Tailscale IP & Show Details
+    - name: Setup & Run Playit.gg
       run: |
-        ip=$(tailscale ip -4)
+        curl -SsL https://playit-cloud.github.io/get-playit/playit-pkgs.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/playit.gpg
+        echo "deb [signed-by=/etc/apt/trusted.gpg.d/playit.gpg] https://playit-cloud.github.io/get-playit/ /" | sudo tee /etc/apt/sources.list.d/playit.list
+        sudo apt update
+        sudo apt install playit -y
+        
         echo "=========================================="
-        echo "🚀 LINUX RDP READY FOR MSTSC"
+        echo "🚀 PLAYIT TUNNEL STARTING..."
         echo "=========================================="
-        echo "CONNECT IP   : $ip"
-        echo "USERNAME     : runner"
-        echo "PASSWORD     : Pass123456!@#"
-        echo "=========================================="
-
-    - name: Keep Alive
-      run: |
-        sleep 21600
+        playit --secret "" || true
